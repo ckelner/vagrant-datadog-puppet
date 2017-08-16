@@ -38,11 +38,14 @@ Vagrant.configure(2) do |config|
     #  "dd_api_key": ENV['DD_API_KEY'] # also tried "#{ENV['DD_API_KEY']}"
     #}
   end
-
+  # Set our API key in the datadog agent config & restart datadog agent
+  # NOTE: I couldn't find a happy way to get environment variables into puppet
+  # facter, so this is my small hack to get the API key set for the agent
   config.vm.provision "shell" do |shell|
     shell.inline = <<-SHELL
       source /tmp/.creds.sh
       sed -i -e "s/api_key.*/api_key: ${DD_API_KEY}/" /etc/dd-agent/datadog.conf
+      /etc/init.d/datadog-agent restart
     SHELL
   end
 
